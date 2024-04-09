@@ -14,6 +14,7 @@
 #define VERDADERO 1
 #define FALSO 0
 #define ErrorAlfabeto 0
+#define ErrorArchivo 0
 
 struct TipoArbolExpresion
 {
@@ -308,6 +309,80 @@ void imprimeArbolInvertido(TipoArbolExpresion *Arbol, int nivel)
     imprimeArbolInvertido(Arbol->Izq, nivel);
 }
 
+void imprimeArbolEnArchivo(TipoArbolExpresion *Arbol, int nivel, FILE *archivo)
+{
+	 if (archivo == NULL)
+    {
+        printf("Error al abrir el archivo de arboles\n");
+        return;
+    }
+    
+    if (Arbol == NULL)
+        return;
+
+    nivel += 10;
+
+    imprimeArbolEnArchivo(Arbol->Der, nivel, archivo);
+
+    fprintf(archivo, "\n");
+    for (int i = 10; i < nivel; i++)
+        fprintf(archivo, " ");
+
+    switch (Arbol->info)
+    {
+	    case SUMA:
+	        fprintf(archivo,"+");
+	        break;
+	    case RESTA:
+	        fprintf(archivo, "-");
+	        break;
+	    case MULTIPLICACION:
+	        fprintf(archivo, "*");
+	        break;
+	    case DIVISION:
+	        fprintf(archivo, "/");
+	        break;
+	    case POTENCIA:
+	        fprintf(archivo, "^");
+	        break;
+	    case SEN:
+	        fprintf(archivo, "sen");
+	        break;
+	    case COS:
+	        fprintf(archivo, "cos");
+	        break;
+	    case TAN:
+	        fprintf(archivo, "tan");
+	        break;
+	    case 'X':
+	        fprintf(archivo, "x");
+	        break;
+	    case 'Y':
+	        fprintf(archivo, "y");
+	        break;
+	    default:
+	        fprintf(archivo, "%f", Arbol->valor);
+	        break;
+    }
+
+    imprimeArbolEnArchivo(Arbol->Izq, nivel, archivo);
+}
+
+void imprimeDerivadaEnArchivo(char* derivada, FILE *archivo){
+	if (archivo == NULL)
+    {
+        printf("Error al abrir el archivo de derivadas\n");
+        return;
+    }
+    
+    if(derivada == '\0'){
+    	printf("La cadena viene vacia");
+    	return;
+	}
+	
+	fprintf(archivo, "Respuesta: %s", derivada);	
+}
+
 void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
 {	
 	char temp[1000];
@@ -321,9 +396,9 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
          switch (Arbol->info)
         {
         	case SUMA:
-		        {
-					if(Arbol->Der->info != 0){
-			        	derivada[0] = '\0';
+		        {		        	
+					if(Arbol->Der->info != 0){	
+						derivada[0] = '\0';		        	
 			            evaluaArbol(Arbol->Izq, derivada);
 			            strcat(derivada, "+ ");
 			            evaluaArbol(Arbol->Der, derivada);
@@ -331,9 +406,10 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
 		            break;
 		        }	
 			case RESTA:
-				{						
-					if(Arbol->Der->info != 0){
-            			derivada[0] = '\0';
+				{
+								
+					if(Arbol->Der->info != 0){ 
+						derivada[0] = '\0';	           			
 						evaluaArbol(Arbol->Izq, derivada);
 						strcat(derivada, "- ");
 						evaluaArbol(Arbol->Der, derivada);
@@ -354,8 +430,7 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
 		                    strcat(temp, &tempCharacter);
 		                    sprintf(multiTemp, "%.0f", deriv_minus);
 		                    strcat(temp, multiTemp);
-		                    strcat(derivada, temp);
-						}
+						}				
 						strcat(derivada, temp);
 	                    strcat(derivada, " ");
 					}else{
@@ -406,24 +481,53 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
 
 int main()
 {
+	FILE *archivoArboles = fopen("arboles.dat", "w");
+	FILE *archivoSalida  = fopen("salida.dat", "w");
+	FILE *archivoEntrada = fopen("entrada.txt", "r");
+	
+	if (archivoEntrada == NULL)
+    {
+        printf("No hay archivo de entrada \n");
+        return ErrorArchivo;
+    }
+	
     TipoArbolExpresion *Arbol;
-    char Expresion[] = "5*X^2 + 10 * X - 5 + cos(X) + 888";
-
-    Lexema = Expresion;
-    tomaToken();
-    Arbol = E();
-    if (Arbol == NULL)
-    {
-        printf("Error en la expresion\n");
-    }
-    else
-    {
-       char derivada[1000] = ""; // Buffer para almacenar la cadena concatenada
-       evaluaArbol(Arbol,derivada);
+    char Expresion[500];
     
-       printf("La derivada es: %s\n", derivada);
-       imprimeArbolInvertido(Arbol, 0);
-    }
-    destruyeArbol(&Arbol);
+    while(fgets(Expresion, 500, archivoEntrada) != NULL){
+    	Lexema = Expresion;
+	    tomaToken();
+	    Arbol = E();
+	    if (Arbol == NULL)
+	    {
+	        printf("Error en la expresion\n");
+	    }
+	    else
+	    {
+	       //imprimir derivada y arbol en consola
+	       char derivada[1000] = ""; // Buffer para almacenar la cadena concatenada
+	       evaluaArbol(Arbol,derivada); 
+		   printf("La expresion es: %s\n", Expresion);
+	       printf("La derivada es: %s\n", derivada);       
+	       imprimeArbolInvertido(Arbol, 0);
+	       printf("\n\n-------------------------------------------- Fin expresion -------------------------------------------- \n");
+	       
+	       //imprimir arbol en archivo
+	       fprintf(archivoArboles, "-------------------------------------------- Inicio del arbol -------------------------------------------- \n\n");
+	       fprintf(archivoArboles, "Arbol para la funcion: %s \n", Expresion);
+	       imprimeArbolEnArchivo(Arbol, 10, archivoArboles);
+	       fprintf(archivoArboles, "\n\n-------------------------------------------- Fin del arbol -------------------------------------------- \n");
+	       
+	       //imprimir derivada en archivo
+	       fprintf(archivoSalida, "-------------------------------------------- Inicio de la derivada -------------------------------------------- \n\n");
+	       fprintf(archivoSalida, "Derivada para la funcion: %s \n", Expresion);
+	       imprimeDerivadaEnArchivo(derivada, archivoSalida);
+	       fprintf(archivoSalida, "\n\n-------------------------------------------- Fin de la derivada -------------------------------------------- \n");
+	    }
+	    destruyeArbol(&Arbol);
+	}
+    
+    fclose(archivoArboles);
+    fclose(archivoSalida);
     return 0;
 }
