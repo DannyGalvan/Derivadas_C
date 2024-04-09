@@ -322,30 +322,22 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
         {
         	case SUMA:
 		        {
-		        	derivada[0] = '\0';
-		            evaluaArbol(Arbol->Izq, derivada);
-		            strcat(derivada, "+ ");
-		            evaluaArbol(Arbol->Der, derivada);		            
-		            
-		            if(Arbol->Der->info == 0){
-            			sprintf(multiTemp, "%.0f ", 0);
-	                    strcat(temp, multiTemp);
-	                    strcat(derivada, temp);
+					if(Arbol->Der->info != 0){
+			        	derivada[0] = '\0';
+			            evaluaArbol(Arbol->Izq, derivada);
+			            strcat(derivada, "+ ");
+			            evaluaArbol(Arbol->Der, derivada);
 					}					
 		            break;
 		        }	
 			case RESTA:
-				{
-					derivada[0] = '\0';
-					evaluaArbol(Arbol->Izq, derivada);
-					strcat(derivada, "- ");
-					evaluaArbol(Arbol->Der, derivada);
-					
-					if(Arbol->Der->info == 0){
-            			sprintf(multiTemp, "%.0f ", 0);
-	                    strcat(temp, multiTemp);
-	                    strcat(derivada, temp);
-					}						
+				{						
+					if(Arbol->Der->info != 0){
+            			derivada[0] = '\0';
+						evaluaArbol(Arbol->Izq, derivada);
+						strcat(derivada, "- ");
+						evaluaArbol(Arbol->Der, derivada);
+					}				
 					break;
 				}        
             case MULTIPLICACION:
@@ -415,7 +407,7 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
 int main()
 {
     TipoArbolExpresion *Arbol;
-    char Expresion[] = "5*X^2+10*X-5";
+    char Expresion[] = "5*X^2 + 10 * X - 5 + cos(X) + 888";
 
     Lexema = Expresion;
     tomaToken();
