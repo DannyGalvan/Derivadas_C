@@ -32,6 +32,20 @@ int Token;
 char *Lexema;
 int TokenAnterior;
 
+void imprimirTextoRojo(const char *texto) {
+    printf("\x1b[31m%s\x1b[0m\n", texto);
+}
+
+// Función para imprimir texto en verde
+void imprimirTextoVerde(const char *texto) {
+    printf("\x1b[32m%s\x1b[0m\n", texto);
+}
+
+// Función para imprimir texto en amarillo
+void imprimirTextoAmarillo(const char *texto) {
+    printf("\x1b[33m%s\x1b[0m", texto);
+}
+
 TipoArbolExpresion *creaArbol(TipoArbolExpresion *Izq, TipoArbolExpresion *Der, int operador)
 {
     TipoArbolExpresion *nuevoNodo = (TipoArbolExpresion *)malloc(sizeof(TipoArbolExpresion));
@@ -317,7 +331,7 @@ void imprimeArbolEnArchivo(TipoArbolExpresion *Arbol, int nivel, FILE *archivo)
 {
 	 if (archivo == NULL)
     {
-        printf("Error al abrir el archivo de arboles\n");
+        imprimirTextoRojo("Error al abrir el archivo de arboles\n");
         return;
     }
     
@@ -375,12 +389,12 @@ void imprimeArbolEnArchivo(TipoArbolExpresion *Arbol, int nivel, FILE *archivo)
 void imprimeDerivadaEnArchivo(char* derivada, FILE *archivo){
 	if (archivo == NULL)
     {
-        printf("Error al abrir el archivo de derivadas\n");
+        imprimirTextoRojo("Error al abrir el archivo de derivadas\n");
         return;
     }
     
     if(derivada == '\0'){
-    	printf("La cadena viene vacia");
+    	imprimirTextoRojo("La cadena viene vacia");
     	return;
 	}
 	
@@ -480,20 +494,6 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
                 
         }
 	}   
-}
-
-void imprimirTextoRojo(const char *texto) {
-    printf("\x1b[31m%s\x1b[0m\n", texto);
-}
-
-// Función para imprimir texto en verde
-void imprimirTextoVerde(const char *texto) {
-    printf("\x1b[32m%s\x1b[0m\n", texto);
-}
-
-// Función para imprimir texto en amarillo
-void imprimirTextoAmarillo(const char *texto) {
-    printf("\x1b[33m%s\x1b[0m", texto);
 }
 
 int main()
