@@ -11,6 +11,10 @@
 #define SEN 'S'
 #define COS 'C'
 #define TAN 'T'
+#define X 'X'
+#define Y 'Y'
+#define PARENTESIS_ABRE '('
+#define PARENTESIS_CIERRA ')'
 #define VERDADERO 1
 #define FALSO 0
 #define ErrorAlfabeto 0
@@ -70,10 +74,10 @@ void tomaToken()
         case RESTA:
         case MULTIPLICACION:
         case DIVISION:
-        case '(':
-        case ')':
-        case 'X':
-        case 'Y':
+        case PARENTESIS_ABRE:
+        case PARENTESIS_CIERRA:
+        case X:
+        case Y:
         case POTENCIA:
             Token = *Lexema++;
             break;
@@ -189,18 +193,18 @@ TipoArbolExpresion *F()
 {
     TipoArbolExpresion *Arbol = NULL;
     int operador;
-    if (Token == '(' || Token == '[' || Token == '{')
+    if (Token == PARENTESIS_ABRE || Token == '[' || Token == '{')
     {
         tomaToken();
         Arbol = E();
-        if (Arbol == NULL || (Token != ')' && Token != ']' && Token != '}'))
+        if (Arbol == NULL || (Token != PARENTESIS_CIERRA && Token != ']' && Token != '}'))
         {
             destruyeArbol(&Arbol);
             return NULL;
         }
         tomaToken();
     }
-    else if (Token == 'X' || Token == 'Y')
+    else if (Token == X || Token == Y)
     {
         operador = Token;
         tomaToken();
@@ -225,11 +229,11 @@ TipoArbolExpresion *F()
     {
         int operador = Token;
 		tomaToken();
-		if (Token == '(')
+		if (Token == PARENTESIS_ABRE)
 		{
 		    tomaToken();
 		    TipoArbolExpresion* arg = E();
-		    if (arg == NULL || Token != ')')
+		    if (arg == NULL || Token != PARENTESIS_CIERRA)
 		    {
 		        destruyeArbol(&arg);
 		        return NULL;
@@ -295,10 +299,10 @@ void imprimeArbolInvertido(TipoArbolExpresion *Arbol, int nivel)
 	    case TAN:
 	        printf("tan");
 	        break;
-	    case 'X':
+	    case X:
 	        printf("x");
 	        break;
-	    case 'Y':
+	    case Y:
 	        printf("y");
 	        break;
 	    default:
@@ -507,7 +511,7 @@ int main()
 	       //imprimir derivada y arbol en consola
 	       char derivada[1000] = ""; // Buffer para almacenar la cadena concatenada
 	       evaluaArbol(Arbol,derivada); 
-		   printf("La expresion es: %s\n", Expresion);
+		   printf("La expresion es: %s", Expresion);
 	       printf("La derivada es: %s\n", derivada);       
 	       imprimeArbolInvertido(Arbol, 0);
 	       printf("\n\n-------------------------------------------- Fin expresion -------------------------------------------- \n");
@@ -529,5 +533,9 @@ int main()
     
     fclose(archivoArboles);
     fclose(archivoSalida);
+    fclose(archivoEntrada);
+    
+    printf("Presione cualquier tecla para salir...");
+    getchar();
     return 0;
 }
