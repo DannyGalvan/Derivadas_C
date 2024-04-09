@@ -358,10 +358,10 @@ void imprimeArbolEnArchivo(TipoArbolExpresion *Arbol, int nivel, FILE *archivo)
 	    case TAN:
 	        fprintf(archivo, "tan");
 	        break;
-	    case 'X':
+	    case X:
 	        fprintf(archivo, "x");
 	        break;
-	    case 'Y':
+	    case Y:
 	        fprintf(archivo, "y");
 	        break;
 	    default:
@@ -482,6 +482,19 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
 	}   
 }
 
+void imprimirTextoRojo(const char *texto) {
+    printf("\x1b[31m%s\x1b[0m\n", texto);
+}
+
+// Función para imprimir texto en verde
+void imprimirTextoVerde(const char *texto) {
+    printf("\x1b[32m%s\x1b[0m\n", texto);
+}
+
+// Función para imprimir texto en amarillo
+void imprimirTextoAmarillo(const char *texto) {
+    printf("\x1b[33m%s\x1b[0m", texto);
+}
 
 int main()
 {
@@ -491,7 +504,9 @@ int main()
 	
 	if (archivoEntrada == NULL)
     {
-        printf("No hay archivo de entrada \n");
+        imprimirTextoRojo("No hay archivo de entrada \n");
+        imprimirTextoRojo("Debe Crear el archivo de datos de tipo texto (.txt) con el nombre 'entrada' para poder seguir con la ejecucion del programa.");
+        imprimirTextoRojo("El archivo debe estar en la misma ruta del archivo ejecutable");
         return ErrorArchivo;
     }
 	
@@ -504,17 +519,28 @@ int main()
 	    Arbol = E();
 	    if (Arbol == NULL)
 	    {
-	        printf("Error en la expresion\n");
+	    	char errorExpresion [500] = "-Error en la expresion ";
+	    	strcat(errorExpresion, Expresion);
+	        imprimirTextoRojo(errorExpresion);
+	        imprimirTextoRojo("-Verifique que si esta usando x o y estas sean mayusculas (X) o (Y)");
+	        imprimirTextoRojo("-Verifique que no existan signos incorrectos");
+	        imprimirTextoRojo("-Verifique que la estructura de la expresion sea correcta \n");
+	        imprimirTextoRojo("-------------------------------------------- Fin expresion -------------------------------------------- \n");
 	    }
 	    else
 	    {
 	       //imprimir derivada y arbol en consola
 	       char derivada[1000] = ""; // Buffer para almacenar la cadena concatenada
-	       evaluaArbol(Arbol,derivada); 
-		   printf("La expresion es: %s", Expresion);
-	       printf("La derivada es: %s\n", derivada);       
+	       evaluaArbol(Arbol,derivada);
+		   char expresionColor[200] = "La expresion es: ";
+		   strcat(expresionColor, Expresion); 
+	       imprimirTextoAmarillo(expresionColor);
+	       expresionColor[0] = '\0';
+		   strcat(expresionColor, "La derivada es: "); 
+	       strcat(expresionColor, derivada);
+	       imprimirTextoVerde(expresionColor);       
 	       imprimeArbolInvertido(Arbol, 0);
-	       printf("\n\n-------------------------------------------- Fin expresion -------------------------------------------- \n");
+	       imprimirTextoVerde("\n\n-------------------------------------------- Fin expresion -------------------------------------------- \n");
 	       
 	       //imprimir arbol en archivo
 	       fprintf(archivoArboles, "-------------------------------------------- Inicio del arbol -------------------------------------------- \n\n");
@@ -535,7 +561,7 @@ int main()
     fclose(archivoSalida);
     fclose(archivoEntrada);
     
-    printf("Presione cualquier tecla para salir...");
+    imprimirTextoAmarillo("Presione [Enter] para terminar con la ejecucion...");
     getchar();
     return 0;
 }
