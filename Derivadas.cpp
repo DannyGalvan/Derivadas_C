@@ -498,6 +498,16 @@ void evaluaArbol(TipoArbolExpresion* Arbol, char* derivada)
 
 int main()
 {
+	imprimirTextoVerde("BIENVENIDO AL SISTEMA DE DERIVADAS BASICAS \n");
+	
+	imprimirTextoRojo("-Instrucciones");
+	imprimirTextoAmarillo("-Ingrese sus derivadas en el archivo entrada.txt \n");
+	imprimirTextoAmarillo("-Solo es una derivada por linea \n");
+	imprimirTextoAmarillo("-El resultado de los arboles de cada derivada estaran en el archivo arboles.dat \n");
+	imprimirTextoAmarillo("-El resultado de las derivadas estaran en el archivo salida.dat \n\n");
+	imprimirTextoAmarillo("-Aprecie el resultado de sus derivadas: \n\n");
+	imprimirTextoVerde("-------------------------------------------- INICIO -------------------------------------------- \n");
+	
 	FILE *archivoArboles = fopen("arboles.dat", "w");
 	FILE *archivoSalida  = fopen("salida.dat", "w");
 	FILE *archivoEntrada = fopen("entrada.txt", "r");
